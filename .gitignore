@@ -1,0 +1,27 @@
+# Logs
+logs/
+*.log
+
+# Deno caches and temporary output
+.deno/
+.cache/
+.tmp/
+dist/
+out/
+build/
+coverage/
+tmp/
+
+deno.gen/
+deno.deps/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Editor directories and settings
+.vscode/
+.idea/
+
+# Data
+data/
