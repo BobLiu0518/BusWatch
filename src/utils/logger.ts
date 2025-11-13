@@ -1,4 +1,5 @@
 import { blue, cyan, green, red, yellow } from 'std/colors';
+import { QueryRunner, Logger as TypeOrmLogger } from 'typeorm';
 
 export type Level = 'debug' | 'info' | 'warn' | 'error';
 
@@ -73,3 +74,20 @@ const logger: Logger = makeScoped();
 
 export const getLogger = () => logger;
 export const setLogLevel = (level: Level) => core.setLevel(level);
+
+export class CustomTypeOrmLogger implements TypeOrmLogger {
+    private static logger = getLogger().child('Database');
+
+    logQuery() {}
+    logQuerySlow() {}
+    logSchemaBuild() {}
+    logMigration() {}
+
+    logQueryError(error: string | Error, query: string, parameters?: unknown[], _queryRunner?: QueryRunner) {
+        CustomTypeOrmLogger.logger.error(`Error happened when running ${query}`, error, parameters);
+    }
+
+    log(level: 'log' | 'info' | 'warn', message: string, _queryRunner?: QueryRunner) {
+        CustomTypeOrmLogger.logger[({ log: 'debug', info: 'info', warn: 'warn' } as const)[level]](message);
+    }
+}

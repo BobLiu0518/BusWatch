@@ -1,6 +1,7 @@
 import { DataSource, type EntityTarget, type Repository, type EntitySchema } from 'typeorm';
 import { dirname } from 'std/path';
 import settings from '@/config/settings.ts';
+import { CustomTypeOrmLogger } from './logger.ts';
 
 let dataSource: DataSource | null = null;
 
@@ -12,21 +13,11 @@ export async function initOrm(entities: EntitySchema<PlainObject>[], dbFile: str
     const dir = dirname(dbFile);
     await Deno.mkdir(dir, { recursive: true });
 
-    let initialDb: Uint8Array | undefined;
-    try {
-        initialDb = await Deno.readFile(dbFile);
-    } catch (_) {
-        initialDb = undefined;
-    }
-
     const ds = new DataSource({
-        type: 'sqljs',
-        database: initialDb,
-        autoSave: true,
-        autoSaveCallback: async (data: Uint8Array) => {
-            await Deno.writeFile(dbFile, data);
-        },
-        logging: false,
+        type: 'sqlite',
+        database: dbFile,
+        logging: ['warn', 'error'],
+        logger: new CustomTypeOrmLogger(),
         entities,
     });
 

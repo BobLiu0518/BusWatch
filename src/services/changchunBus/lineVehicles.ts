@@ -49,6 +49,7 @@ export default class ChangchunBusVehiclesService extends Service {
         let vehicleCount = 0;
 
         const tasks = lineInfos.map(async (lineInfo) => {
+            this.logger.debug(`Getting realtime for ${lineInfo.lineName}-${lineInfo.isUpDown}`);
             const realtime = await getRealtime(lineInfo.lineNo, lineInfo.isUpDown, '1');
             if ('error' in realtime) {
                 this.logger.error(`获取 ${lineInfo.lineName}[${lineInfo.isUpDown}] 实时信息失败`);
@@ -58,17 +59,19 @@ export default class ChangchunBusVehiclesService extends Service {
             const vehicles = realtime.allBusList;
             vehicleCount += vehicles.length;
 
-            await vehicleRepo.save(vehicles);
-            await vehicleOnlineRepo.save(
+            await vehicleRepo.upsert(vehicles, ['busNoChar']);
+            await vehicleOnlineRepo.upsert(
                 vehicles.map((vehicle) => ({
                     busNoChar: vehicle.busNoChar,
                     lineNo: lineInfo.lineNo,
                     date,
-                }))
+                })),
+                ['busNoChar', 'lineNo', 'date']
             );
         });
         await Promise.allSettled(tasks);
 
+        this.logger.debug('Finished');
         this.logger.info(`Upserted ${vehicleCount} vehicles`);
     }
 }

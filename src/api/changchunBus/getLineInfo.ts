@@ -13,7 +13,7 @@ type ChangchunBusLineInfo = {
     speedStatus: string;
     smoothStatus: string;
     comfortStatus: string;
-    offLineList: unknown[];
+    offLineList: never[];
     lineName: string;
     icinfo: string;
 };

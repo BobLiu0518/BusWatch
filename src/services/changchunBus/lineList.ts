@@ -44,16 +44,19 @@ export default class ChangchunBusLineService extends Service {
         const linesRepo = getRepository(lineMetaEntity);
         const lineInfosRepo = getRepository(lineInfoEntity);
 
+        this.logger.debug('Getting line list');
         const lineList = await getLineList();
-        await linesRepo.save(lineList);
+        await linesRepo.upsert(lineList, ['lineNo']);
 
         await Promise.allSettled(
             lineList.map(async (line) => {
+                this.logger.debug(`Getting line info for ${line.lineName}`);
                 const lineInfo = await getLineInfo(line.lineNo);
-                await lineInfosRepo.save(lineInfo);
+                await lineInfosRepo.upsert(lineInfo, ['lineNo', 'isUpDown']);
             })
         );
 
+        this.logger.debug('Finished');
         this.logger.info(`Upserted ${lineList.length} lines`);
     }
 }
