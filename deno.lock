@@ -10,8 +10,7 @@
     "jsr:@std/internal@^1.0.9": "1.0.10",
     "jsr:@std/path@0.217": "0.217.0",
     "jsr:@std/path@1": "1.1.2",
-    "jsr:@std/path@^1.1.1": "1.1.2",
-    "npm:typeorm@0.3.20": "0.3.20_sql.js@1.9.0_sqlite3@5.1.7"
+    "jsr:@std/path@^1.1.1": "1.1.2"
   },
   "jsr": {
     "@denosaurs/plug@1.1.0": {
@@ -917,13 +916,10 @@
     "https://deno.land/x/sqlite@v3.9.1/src/wasm.ts": "e79d0baa6e42423257fb3c7cc98091c54399254867e0f34a09b5bdef37bd9487"
   },
   "workspace": {
-    "dependencies": [
-      "npm:typeorm@0.3.20"
-    ],
     "packageJson": {
       "dependencies": [
         "npm:sqlite3@^5.1.7",
-        "npm:typeorm@0.3.20"
+        "npm:typeorm@~0.3.27"
       ]
     }
   }
