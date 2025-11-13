@@ -46,32 +46,32 @@ export default class ChangchunBusVehiclesService extends Service {
 
         const date = new Date();
         const lineInfos = await lineInfosRepo.find();
-        let vehicleCount = 0;
 
+        const vehicles: VehicleRecord[] = [];
+        const vehicleOnlines: VehicleOnlineRecord[] = [];
         const tasks = lineInfos.map(async (lineInfo) => {
             this.logger.debug(`Getting realtime for ${lineInfo.lineName}-${lineInfo.isUpDown}`);
             const realtime = await getRealtime(lineInfo.lineNo, lineInfo.isUpDown, '1');
             if ('error' in realtime) {
-                this.logger.error(`获取 ${lineInfo.lineName}[${lineInfo.isUpDown}] 实时信息失败`);
-                return;
+                throw new Error(`获取 ${lineInfo.lineName}[${lineInfo.isUpDown}] 实时信息失败`);
             }
 
-            const vehicles = realtime.allBusList;
-            vehicleCount += vehicles.length;
-
-            await vehicleRepo.upsert(vehicles, ['busNoChar']);
-            await vehicleOnlineRepo.upsert(
-                vehicles.map((vehicle) => ({
+            vehicles.push(...realtime.allBusList);
+            vehicleOnlines.push(
+                ...realtime.allBusList.map((vehicle) => ({
                     busNoChar: vehicle.busNoChar,
                     lineNo: lineInfo.lineNo,
                     date,
-                })),
-                ['busNoChar', 'lineNo', 'date']
+                }))
             );
         });
-        await Promise.allSettled(tasks);
+        const results = await Promise.allSettled(tasks);
+        results.filter((r) => r.status === 'rejected').forEach((r) => this.logger.error(r.reason));
 
-        this.logger.debug('Finished');
-        this.logger.info(`Upserted ${vehicleCount} vehicles`);
+        this.logger.debug(`Saving ${vehicles.length} vehicles`);
+        await vehicleRepo.upsert(vehicles, { conflictPaths: ['busNoChar'], skipUpdateIfNoValuesChanged: true });
+        await vehicleOnlineRepo.upsert(vehicleOnlines, { conflictPaths: ['busNoChar', 'lineNo', 'date'], skipUpdateIfNoValuesChanged: true });
+
+        this.logger.info(`Upserted ${vehicles.length} vehicles`);
     }
 }
