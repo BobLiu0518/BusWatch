@@ -1,6 +1,6 @@
 import { DataSource, type EntityTarget, type Repository, type EntitySchema } from 'typeorm';
 import { dirname } from 'std/path';
-import settings from '@/config/settings.ts';
+import settings from './settings.ts';
 import { CustomTypeOrmLogger } from './logger.ts';
 
 let dataSource: DataSource | null = null;

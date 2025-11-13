@@ -1,6 +1,7 @@
 {
     "imports": {
         "@/": "./src/",
+        "~/": "./",
         "std/colors": "https://deno.land/std@0.224.0/fmt/colors.ts",
         "std/path": "https://deno.land/std@0.224.0/path/mod.ts"
     },

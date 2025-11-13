@@ -1,4 +1,4 @@
-import settings from '@/config/settings.ts';
+import settings from '@/utils/settings.ts';
 import { getLogger, setLogLevel } from '@/utils/logger.ts';
 import Poller from '@/utils/poller.ts';
 import { Service, autoloadServices } from '@/utils/service.ts';

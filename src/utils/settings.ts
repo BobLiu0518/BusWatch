@@ -12,7 +12,7 @@ type RawSettings = Partial<Settings>;
 
 const loadJsonConfig = (): RawSettings => {
     try {
-        const url = new URL('./settings.json', import.meta.url);
+        const url = new URL(import.meta.resolve('~/settings.json'));
         const txt = Deno.readTextFileSync(url);
         const obj: RawSettings = JSON.parse(txt);
         return obj ?? {};
