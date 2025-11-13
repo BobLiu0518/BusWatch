@@ -19,11 +19,13 @@ export abstract class Service {
     }
 
     static getServices(): { ctor: typeof Service; instance: Service }[] {
-        return Service.registry.map(({ ctor, segments }) => {
-            const logger = segments.reduce((lg, seg) => lg.child(seg), getLogger());
-            const instance: Service = Reflect.construct(ctor, [logger]);
-            return { ctor, instance };
-        });
+        return Service.registry
+            .filter(({ ctor }) => !ctor.disabled)
+            .map(({ ctor, segments }) => {
+                const logger = segments.reduce((lg, seg) => lg.child(seg), getLogger());
+                const instance: Service = Reflect.construct(ctor, [logger]);
+                return { ctor, instance };
+            });
     }
 
     static getEntities(): EntitySchema[] {
@@ -56,7 +58,7 @@ export const autoloadServices = async (path: URL) => {
                 if (typeof service === 'function' && service.prototype instanceof Service) {
                     const fullSeg = [...segments, fileBase];
                     logger.info(`${!service.disabled ? 'Load' : 'Skip'} ${fullSeg.slice(1).join(' > ')}`);
-                    if (!service.disabled) Service.register(service, fullSeg);
+                    Service.register(service, fullSeg);
                 }
             } catch (err) {
                 logger.error(`Load ${modUrl} failed.`, err);
