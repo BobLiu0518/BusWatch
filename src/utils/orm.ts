@@ -1,5 +1,4 @@
 import { DataSource, type EntityTarget, type Repository, type EntitySchema } from 'typeorm';
-import { dirname } from 'std/path';
 import settings from './settings.ts';
 import { CustomTypeOrmLogger } from './logger.ts';
 
@@ -7,15 +6,12 @@ let dataSource: DataSource | null = null;
 
 type PlainObject = Record<string, unknown>;
 
-export async function initOrm(entities: EntitySchema<PlainObject>[], dbFile: string = settings.dbFile): Promise<DataSource> {
+export async function initOrm(entities: EntitySchema<PlainObject>[], connectionString: string = settings.database): Promise<DataSource> {
     if (dataSource) return dataSource;
 
-    const dir = dirname(dbFile);
-    await Deno.mkdir(dir, { recursive: true });
-
     const ds = new DataSource({
-        type: 'sqlite',
-        database: dbFile,
+        type: 'postgres',
+        url: connectionString,
         logging: ['warn', 'error'],
         logger: new CustomTypeOrmLogger(),
         entities,

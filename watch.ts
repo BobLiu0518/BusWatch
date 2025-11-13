@@ -13,7 +13,7 @@ const main = async () => {
 
     const services = Service.getServices();
     const entities = Service.getEntities();
-    await initOrm(entities, settings.dbFile);
+    await initOrm(entities, settings.database);
 
     const pollers: Poller[] = services.map(
         ({ instance: service, ctor }) =>

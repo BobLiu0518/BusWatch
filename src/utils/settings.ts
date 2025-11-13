@@ -1,11 +1,11 @@
 type Settings = {
     logLevel: 'debug' | 'info' | 'warn' | 'error';
-    dbFile: string;
+    database: string;
 };
 
 const defaults: Settings = {
     logLevel: 'info',
-    dbFile: 'data/app.db',
+    database: '',
 };
 
 type RawSettings = Partial<Settings>;
@@ -24,10 +24,9 @@ const loadJsonConfig = (): RawSettings => {
 const raw = loadJsonConfig();
 
 const isLogLevel = (v: unknown): v is Settings['logLevel'] => v === 'debug' || v === 'info' || v === 'warn' || v === 'error';
-
 const settings: Settings = {
     logLevel: isLogLevel(raw.logLevel) ? raw.logLevel : defaults.logLevel,
-    dbFile: typeof raw.dbFile === 'string' ? raw.dbFile : defaults.dbFile,
+    database: raw.database ?? defaults.database,
 };
 
 export default settings;

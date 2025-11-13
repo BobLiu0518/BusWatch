@@ -26,8 +26,5 @@ Thumbs.db
 # Data
 data/
 
-# Node modules
-node_modules/
-
 # Config files
 settings.json

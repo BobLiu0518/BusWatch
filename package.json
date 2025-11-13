@@ -1,6 +1,0 @@
-{
-    "dependencies": {
-        "sqlite3": "^5.1.7",
-        "typeorm": "^0.3.27"
-    }
-}

@@ -1,4 +1,4 @@
 {
     "logLevel": "info",
-    "dbFile": "./data/data.db"
+    "database": "postgresql://username:password@host:port/database"
 }

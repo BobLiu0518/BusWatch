@@ -3,7 +3,9 @@
         "@/": "./src/",
         "~/": "./",
         "std/colors": "https://deno.land/std@0.224.0/fmt/colors.ts",
-        "std/path": "https://deno.land/std@0.224.0/path/mod.ts"
+        "std/path": "https://deno.land/std@0.224.0/path/mod.ts",
+        "typeorm": "npm:typeorm@^0.3.27",
+        "pg": "npm:pg@^8.16.3"
     },
     "compilerOptions": {
         "lib": ["deno.window", "es2024"]
