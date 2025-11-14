@@ -13,13 +13,15 @@ const vehiclesEntity = new EntitySchema<VehicleRecord>({
     },
 });
 
-type VehicleOnlineRecord = { busNoChar: string; lineNo: string; date: Date };
+type VehicleOnlineRecord = { busNoChar: string; lineNo: string; date: Date; firstSeen: Date; lastSeen: Date };
 const vehiclesOnlineMetaEntity = new EntitySchema<VehicleOnlineRecord>({
     name: 'changchunBusVehiclesOnline',
     columns: {
         busNoChar: { type: 'text', primary: true },
         lineNo: { type: 'text', primary: true },
         date: { type: 'date', primary: true },
+        firstSeen: { type: 'time' },
+        lastSeen: { type: 'time' },
     },
     relations: {
         busNoChar: {
@@ -62,6 +64,8 @@ export default class ChangchunBusVehiclesService extends Service {
                     busNoChar: vehicle.busNoChar,
                     lineNo: lineInfo.lineNo,
                     date,
+                    firstSeen: date,
+                    lastSeen: date,
                 }))
             );
         });
@@ -70,7 +74,13 @@ export default class ChangchunBusVehiclesService extends Service {
 
         this.logger.debug(`Saving ${vehicles.length} vehicles`);
         await vehicleRepo.upsert(vehicles, { conflictPaths: ['busNoChar'], skipUpdateIfNoValuesChanged: true });
-        await vehicleOnlineRepo.upsert(vehicleOnlines, { conflictPaths: ['busNoChar', 'lineNo', 'date'], skipUpdateIfNoValuesChanged: true });
+        await vehicleOnlineRepo
+            .createQueryBuilder()
+            .insert()
+            .into(vehiclesOnlineMetaEntity)
+            .values(vehicleOnlines)
+            .orUpdate(['lastSeen'], ['busNoChar', 'lineNo', 'date'])
+            .execute();
 
         this.logger.info(`Upserted ${vehicles.length} vehicles`);
     }
